@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Booking System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calendar-alt"></i> Event Booking System</h1>
+            <div class="user-info" id="userInfo">
+                Not logged in
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('auth')">
+                <i class="fas fa-user"></i> Authentication
+            </button>
+            <button class="tab-button" onclick="switchTab('events')">
+                <i class="fas fa-calendar"></i> Events
+            </button>
+            <button class="tab-button" onclick="switchTab('bookings')">
+                <i class="fas fa-ticket-alt"></i> Bookings
+            </button>
+            <button class="tab-button" onclick="switchTab('console')">
+                <i class="fas fa-terminal"></i> Console Logs
+            </button>
+        </div>
+
+        <!-- Authentication Tab -->
+        <div id="authTab" class="tab-content active">
+            <div class="auth-forms">
+                <!-- Register Form -->
+                <div class="form-container">
+                    <h2><i class="fas fa-user-plus"></i> Register</h2>
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="registerEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password:</label>
+                            <input type="password" id="registerPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Name:</label>
+                            <input type="text" id="registerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Role:</label>
+                            <select id="registerRole">
+                                <option value="CUSTOMER">Customer</option>
+                                <option value="ORGANIZER">Organizer</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Register
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Login Form -->
+                <div class="form-container">
+                    <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password:</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Current Token -->
+                <div class="form-container">
+                    <h2><i class="fas fa-key"></i> Current Token</h2>
+                    <div class="token-display">
+                        <textarea id="currentToken" readonly placeholder="Login to see token"></textarea>
+                        <button onclick="copyToken()" class="btn btn-secondary">
+                            <i class="fas fa-copy"></i> Copy Token
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Tab -->
+        <div id="eventsTab" class="tab-content">
+            <div class="events-section">
+                <!-- Create Event Form (Organizer only) -->
+                <div class="form-container" id="createEventForm">
+                    <h2><i class="fas fa-plus-circle"></i> Create New Event</h2>
+                    <form id="eventForm">
+                        <div class="form-group">
+                            <label>Event Title:</label>
+                            <input type="text" id="eventTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description:</label>
+                            <textarea id="eventDescription" rows="3"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Date:</label>
+                                <input type="datetime-local" id="eventDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Location:</label>
+                                <input type="text" id="eventLocation" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Capacity:</label>
+                                <input type="number" id="eventCapacity" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Price ($):</label>
+                                <input type="number" id="eventPrice" min="0" step="0.01" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calendar-plus"></i> Create Event
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Events List -->
+                <div class="events-list">
+                    <h2><i class="fas fa-calendar-week"></i> Available Events</h2>
+                    <div id="eventsList">
+                        <p class="loading">Loading events...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings Tab -->
+        <div id="bookingsTab" class="tab-content">
+            <div class="bookings-section">
+                <!-- Make Booking Form -->
+                <div class="form-container">
+                    <h2><i class="fas fa-ticket-alt"></i> Book Tickets</h2>
+                    <form id="bookingForm">
+                        <div class="form-group">
+                            <label>Select Event:</label>
+                            <select id="bookingEventId" required>
+                                <option value="">-- Select Event --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Number of Tickets:</label>
+                            <input type="number" id="bookingTickets" min="1" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Available Tickets:</label>
+                            <span id="availableTickets">0</span>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-shopping-cart"></i> Book Now
+                        </button>
+                    </form>
+                </div>
+
+                <!-- My Bookings -->
+                <div class="bookings-list">
+                    <h2><i class="fas fa-receipt"></i> My Bookings</h2>
+                    <button onclick="loadMyBookings()" class="btn btn-secondary">
+                        <i class="fas fa-sync"></i> Refresh Bookings
+                    </button>
+                    <div id="myBookings">
+                        <p>Login as customer to see bookings</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Console Logs Tab -->
+        <div id="consoleTab" class="tab-content">
+            <div class="console-section">
+                <h2><i class="fas fa-terminal"></i> Background Job Logs</h2>
+                <div class="console-controls">
+                    <button onclick="clearConsole()" class="btn btn-secondary">
+                        <i class="fas fa-trash"></i> Clear Console
+                    </button>
+                    <button onclick="toggleAutoScroll()" class="btn btn-secondary">
+                        <i class="fas fa-scroll"></i> Auto-scroll: <span id="autoScrollStatus">ON</span>
+                    </button>
+                </div>
+                <div class="console-output" id="consoleOutput">
+                    <div class="console-message">
+                        <span class="timestamp">[14:30:45]</span>
+                        <span class="log-info">ℹ️ Waiting for background jobs...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Event Booking System API | Backend running on: <span id="apiUrl">http://localhost:5000</span></p>
+            <p class="status" id="apiStatus">
+                <i class="fas fa-circle status-ok"></i> API Connected
+            </p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
